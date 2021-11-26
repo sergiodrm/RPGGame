@@ -11,6 +11,8 @@
 
 ARPGCharacter::ARPGCharacter()
 {
+    bUseControllerRotationYaw = false;
+
     UCapsuleComponent* capsuleComponent = GetCapsuleComponent();
     capsuleComponent->SetCapsuleHalfHeight(96.f);
     capsuleComponent->SetCapsuleRadius(42.f);
@@ -86,8 +88,13 @@ void ARPGCharacter::OnMovementAction(const FInputActionValue& actionValue)
 {
     ensure(actionValue.GetValueType() == EInputActionValueType::Axis2D);
     const FVector direction {actionValue[0], actionValue[1], 0.f};
-    const FRotator forward = GetActorForwardVector().Rotation();
+    const FRotator forward = GetControlRotation();
     AddMovementInput(forward.RotateVector(direction));
+
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, FString::Printf(TEXT("OnMovementAction: %s"), *actionValue.ToString()));
+    }
 }
 
 void ARPGCharacter::OnStartJumpAction(const FInputActionValue& actionValue)
@@ -105,4 +112,8 @@ void ARPGCharacter::OnLookAction(const FInputActionValue& actionValue)
     ensure(actionValue.GetValueType() == EInputActionValueType::Axis2D);
     AddControllerPitchInput(-actionValue[1]);
     AddControllerYawInput(actionValue[0]);
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Red, FString::Printf(TEXT("OnLookAction: %s"), *actionValue.ToString()));
+    }
 }
