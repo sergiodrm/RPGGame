@@ -16,6 +16,9 @@ public:
     UFUNCTION(BlueprintCallable)
     bool IsJumping() const;
 
+    UFUNCTION(BlueprintCallable)
+    float GetForwardSpeed() const;
+
 private:
     UPROPERTY(Transient)
     class ARPGCharacter* OwnerCharacter;

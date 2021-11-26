@@ -23,5 +23,5 @@ bool URPGAnimInstance::IsJumping() const
 
 float URPGAnimInstance::GetForwardSpeed() const
 {
-    return 0.f;
+    return OwnerCharacter ? OwnerCharacter->GetVelocity().SizeSquared() : 0.f;
 }
