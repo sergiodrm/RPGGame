@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ARPGCharacter::ARPGCharacter()
@@ -71,6 +72,11 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
             inputComponent->BindAction(InputActions.LookAction, ETriggerEvent::Triggered, this, &ARPGCharacter::OnLookAction);
         }
     }
+}
+
+bool ARPGCharacter::IsJumping() const
+{
+    return GetCharacterMovement()->MovementMode == MOVE_Falling;
 }
 
 void ARPGCharacter::OnMovementAction(const FInputActionValue& actionValue)

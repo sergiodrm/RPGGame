@@ -7,4 +7,16 @@ UCLASS(Blueprintable)
 class URPGAnimInstance : public UAnimInstance
 {
     GENERATED_BODY()
+
+public:
+    virtual void NativeBeginPlay() override;
+
+    UFUNCTION(BlueprintCallable)
+    FVector GetMovementDirection() const;
+    UFUNCTION(BlueprintCallable)
+    bool IsJumping() const;
+
+private:
+    UPROPERTY(Transient)
+    class ARPGCharacter* OwnerCharacter;
 };

@@ -27,6 +27,7 @@ public:
     ARPGCharacter();
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+    bool IsJumping() const;
 protected:
     UFUNCTION()
     void OnMovementAction(const FInputActionValue& actionValue);
