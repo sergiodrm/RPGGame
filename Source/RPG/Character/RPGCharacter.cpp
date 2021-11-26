@@ -20,8 +20,11 @@ ARPGCharacter::ARPGCharacter()
     SkeletalMeshComponent->SetRelativeLocation({0.f, 0.f, -capsuleComponent->GetScaledCapsuleHalfHeight()});
     SkeletalMeshComponent->SetRelativeRotation({0.f, -90.f, 0.f});
 
-    WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-    WeaponMeshComponent->SetupAttachment(SkeletalMeshComponent);
+    SwordMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMeshComponent"));
+    SwordMeshComponent->SetupAttachment(SkeletalMeshComponent, TEXT("RightHandSocket"));
+
+    ShieldMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ShieldMeshComponent"));
+    ShieldMeshComponent->SetupAttachment(SkeletalMeshComponent);
 
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     SpringArmComponent->SetupAttachment(SkeletalMeshComponent);
