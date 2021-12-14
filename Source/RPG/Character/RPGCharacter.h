@@ -8,15 +8,6 @@
 #include "AbilitySystemInterface.h"
 #include "RPGCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum class ERPGAbilityInput : uint8
-{
-    None,
-    Confirm,
-    Cancel,
-    Ability1,
-    Ability2,
-};
 
 USTRUCT()
 struct FRPGCharacterInputActions
@@ -42,6 +33,8 @@ public:
     ARPGCharacter();
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+    virtual void PossessedBy(AController* NewController) override;
+
     bool IsJumping() const;
     UFUNCTION(BlueprintCallable)
     FORCEINLINE bool IsBlocking() const { return Blocking; }
@@ -64,13 +57,18 @@ protected:
     UFUNCTION()
     void Turn(float value);
 
+    virtual void InitializeAttributes();
+    virtual void InitializeAbilities();
+
 public:
     UPROPERTY(EditDefaultsOnly)
     FRPGCharacterInputActions InputActions;
     UPROPERTY(EditDefaultsOnly, Transient)
     class UInputMappingContext* InputMapping;
     UPROPERTY(EditDefaultsOnly, Transient)
-    TSubclassOf<class UGameplayAbility> Ability;
+    TSubclassOf<class URPGGameplayAbility> Ability;
+    UPROPERTY(EditDefaultsOnly, Transient)
+    TSubclassOf<class UGameplayEffect> DefaultAbilityEffect;
 private:
     UPROPERTY(VisibleAnywhere, Transient)
     class USkeletalMeshComponent* SkeletalMeshComponent;

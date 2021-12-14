@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "RPG/AbilitySystem/RPGGameplayAbility.h"
 #include "RPG/AbilitySystem/RPGAttributeSet.h"
 
 ARPGCharacter::ARPGCharacter()
@@ -18,25 +19,27 @@ ARPGCharacter::ARPGCharacter()
     capsuleComponent->SetCapsuleHalfHeight(96.f);
     capsuleComponent->SetCapsuleRadius(42.f);
 
-    SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-    SkeletalMeshComponent->SetupAttachment(RootComponent);
-    SkeletalMeshComponent->SetRelativeLocation({0.f, 0.f, -capsuleComponent->GetScaledCapsuleHalfHeight()});
-    SkeletalMeshComponent->SetRelativeRotation({0.f, -90.f, 0.f});
+    if (USkeletalMeshComponent* mesh = GetMesh())
+    {
+        mesh->SetupAttachment(RootComponent);
+        mesh->SetRelativeLocation({0.f, 0.f, -capsuleComponent->GetScaledCapsuleHalfHeight()});
+        mesh->SetRelativeRotation({0.f, -90.f, 0.f});
 
-    SwordMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMeshComponent"));
-    SwordMeshComponent->SetupAttachment(SkeletalMeshComponent, TEXT("RightHandSocket"));
+        SwordMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMeshComponent"));
+        SwordMeshComponent->SetupAttachment(mesh, TEXT("RightHandSocket"));
 
-    ShieldStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMeshComponent"));
-    ShieldStaticMeshComponent->SetupAttachment(SkeletalMeshComponent, TEXT("ShieldSocket"));
+        ShieldStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMeshComponent"));
+        ShieldStaticMeshComponent->SetupAttachment(mesh, TEXT("ShieldSocket"));
 
-    SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-    SpringArmComponent->SetupAttachment(SkeletalMeshComponent);
-    SpringArmComponent->TargetArmLength = 200.f;
-    SpringArmComponent->bEnableCameraLag = true;
-    SpringArmComponent->bUsePawnControlRotation = true;
+        SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+        SpringArmComponent->SetupAttachment(mesh);
+        SpringArmComponent->TargetArmLength = 200.f;
+        SpringArmComponent->bEnableCameraLag = true;
+        SpringArmComponent->bUsePawnControlRotation = true;
 
-    CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-    CameraComponent->SetupAttachment(SpringArmComponent);
+        CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+        CameraComponent->SetupAttachment(SpringArmComponent);
+    }
 
     AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
     AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
@@ -72,12 +75,10 @@ void ARPGCharacter::BeginPlay()
             }
         });
 
-        if (Ability)
-        {
-            const FGameplayAbilitySpec abilitySpec(Ability, 1, static_cast<uint8>(ERPGAbilityInput::Ability1));
-            AbilitySystemComponent->GiveAbility(abilitySpec);
-            AbilitySystemComponent->InitAbilityActorInfo(this, this);
-        }
+        AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+        InitializeAttributes();
+        InitializeAbilities();
     }
 }
 
@@ -96,15 +97,28 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
     if (AbilitySystemComponent)
     {
-        AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent,
-                                                                      FGameplayAbilityInputBinds(
-                                                                                                 TEXT("ConfirmTarget"),
-                                                                                                 TEXT("CancelTarget"),
-                                                                                                 TEXT("ERPGAbilityInput"),
-                                                                                                 static_cast<int32>(ERPGAbilityInput::Confirm),
-                                                                                                 static_cast<int32>(ERPGAbilityInput::Cancel)
-                                                                                                ));
+        const FGameplayAbilityInputBinds inputBinds(
+                                                    TEXT("ConfirmTarget"),
+                                                    TEXT("CancelTarget"),
+                                                    TEXT("ERPGAbilityInput"),
+                                                    static_cast<int32>(ERPGAbilityInput::Confirm),
+                                                    static_cast<int32>(ERPGAbilityInput::Cancel)
+                                                   );
+        AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent, inputBinds);
     }
+}
+
+void ARPGCharacter::PossessedBy(AController* NewController)
+{
+    Super::PossessedBy(NewController);
+
+    //if (AbilitySystemComponent)
+    //{
+    //    AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+    //    InitializeAttributes();
+    //    InitializeAbilities();
+    //}
 }
 
 bool ARPGCharacter::IsJumping() const
@@ -145,4 +159,28 @@ void ARPGCharacter::LookUp(float value)
 void ARPGCharacter::Turn(float value)
 {
     AddControllerYawInput(value);
+}
+
+void ARPGCharacter::InitializeAttributes()
+{
+    if (AbilitySystemComponent && DefaultAbilityEffect)
+    {
+        FGameplayEffectContextHandle effectContext = AbilitySystemComponent->MakeEffectContext();
+        effectContext.AddSourceObject(this);
+
+        FGameplayEffectSpecHandle specHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAbilityEffect, 1.f, effectContext);
+        if (specHandle.IsValid())
+        {
+            FActiveGameplayEffectHandle gameplayEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
+        }
+    }
+}
+
+void ARPGCharacter::InitializeAbilities()
+{
+    if (AbilitySystemComponent && Ability && !AbilitySystemComponent->FindAbilitySpecFromClass(Ability))
+    {
+        const FGameplayAbilitySpec abilitySpec(Ability, 1, static_cast<int32>(Ability.GetDefaultObject()->AbilityInput), this);
+        AbilitySystemComponent->GiveAbility(abilitySpec);
+    }
 }
