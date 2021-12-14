@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "RPG/AbilitySystem/RPGAttributeSet.h"
 
 ARPGCharacter::ARPGCharacter()
 {
@@ -25,8 +26,8 @@ ARPGCharacter::ARPGCharacter()
     SwordMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMeshComponent"));
     SwordMeshComponent->SetupAttachment(SkeletalMeshComponent, TEXT("RightHandSocket"));
 
-    ShieldMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ShieldMeshComponent"));
-    ShieldMeshComponent->SetupAttachment(SkeletalMeshComponent);
+    ShieldStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMeshComponent"));
+    ShieldStaticMeshComponent->SetupAttachment(SkeletalMeshComponent, TEXT("ShieldSocket"));
 
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     SpringArmComponent->SetupAttachment(SkeletalMeshComponent);
@@ -36,6 +37,12 @@ ARPGCharacter::ARPGCharacter()
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
     CameraComponent->SetupAttachment(SpringArmComponent);
+
+    AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+    AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+    AbilitySystemComponent->SetIsReplicated(false);
+
+    RPGAttributeSet = CreateDefaultSubobject<URPGAttributeSet>(TEXT("RGPAttributeSet"));
 }
 
 void ARPGCharacter::BeginPlay()
@@ -54,28 +61,49 @@ void ARPGCharacter::BeginPlay()
             subsystem->AddMappingContext(InputMapping, 0);
         }
     }
+
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(RPGAttributeSet->GetHealthAttribute()).AddLambda([](const FOnAttributeChangeData& data)
+        {
+            if (GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Red, FString::Printf(TEXT("Health changed: %f"), data.NewValue));
+            }
+        });
+
+        if (Ability)
+        {
+            const FGameplayAbilitySpec abilitySpec(Ability, 1, static_cast<uint8>(ERPGAbilityInput::Ability1));
+            AbilitySystemComponent->GiveAbility(abilitySpec);
+            AbilitySystemComponent->InitAbilityActorInfo(this, this);
+        }
+    }
 }
 
 void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    UEnhancedInputComponent* inputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-    if (inputComponent)
+    PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ARPGCharacter::OnStartJump);
+    PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ARPGCharacter::OnEndJump);
+
+    PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ARPGCharacter::OnMoveForward);
+    PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ARPGCharacter::OnMoveRight);
+    PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ARPGCharacter::Turn);
+    PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ARPGCharacter::LookUp);
+
+
+    if (AbilitySystemComponent)
     {
-        if (InputActions.MovementAction)
-        {
-            inputComponent->BindAction(InputActions.MovementAction, ETriggerEvent::Triggered, this, &ARPGCharacter::OnMovementAction);
-        }
-        if (InputActions.JumpAction)
-        {
-            inputComponent->BindAction(InputActions.JumpAction, ETriggerEvent::Started, this, &ARPGCharacter::OnStartJumpAction);
-            inputComponent->BindAction(InputActions.JumpAction, ETriggerEvent::Completed, this, &ARPGCharacter::OnEndJumpAction);
-        }
-        if (InputActions.LookAction)
-        {
-            inputComponent->BindAction(InputActions.LookAction, ETriggerEvent::Triggered, this, &ARPGCharacter::OnLookAction);
-        }
+        AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent,
+                                                                      FGameplayAbilityInputBinds(
+                                                                                                 TEXT("ConfirmTarget"),
+                                                                                                 TEXT("CancelTarget"),
+                                                                                                 TEXT("ERPGAbilityInput"),
+                                                                                                 static_cast<int32>(ERPGAbilityInput::Confirm),
+                                                                                                 static_cast<int32>(ERPGAbilityInput::Cancel)
+                                                                                                ));
     }
 }
 
@@ -84,27 +112,37 @@ bool ARPGCharacter::IsJumping() const
     return GetCharacterMovement()->MovementMode == MOVE_Falling;
 }
 
-void ARPGCharacter::OnMovementAction(const FInputActionValue& actionValue)
-{
-    ensure(actionValue.GetValueType() == EInputActionValueType::Axis2D);
-    const FVector direction {actionValue[0], actionValue[1], 0.f};
-    const FRotator forward = GetControlRotation();
-    AddMovementInput(forward.RotateVector(direction));
-}
 
-void ARPGCharacter::OnStartJumpAction(const FInputActionValue& actionValue)
+void ARPGCharacter::OnStartJump()
 {
     Jump();
 }
 
-void ARPGCharacter::OnEndJumpAction(const FInputActionValue& actionValue)
+void ARPGCharacter::OnEndJump()
 {
     StopJumping();
 }
 
-void ARPGCharacter::OnLookAction(const FInputActionValue& actionValue)
+void ARPGCharacter::OnMoveForward(float value)
 {
-    ensure(actionValue.GetValueType() == EInputActionValueType::Axis2D);
-    AddControllerPitchInput(-actionValue[1]);
-    AddControllerYawInput(actionValue[0]);
+    const FVector direction {value, 0.f, 0.f};
+    const FRotator forward = GetControlRotation();
+    AddMovementInput(forward.RotateVector(direction));
+}
+
+void ARPGCharacter::OnMoveRight(float value)
+{
+    const FVector direction {0.f, value, 0.f};
+    const FRotator forward = GetControlRotation();
+    AddMovementInput(forward.RotateVector(direction));
+}
+
+void ARPGCharacter::LookUp(float value)
+{
+    AddControllerPitchInput(value);
+}
+
+void ARPGCharacter::Turn(float value)
+{
+    AddControllerYawInput(value);
 }

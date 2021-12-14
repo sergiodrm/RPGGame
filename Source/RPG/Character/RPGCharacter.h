@@ -4,7 +4,19 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
 #include "RPGCharacter.generated.h"
+
+UENUM(BlueprintType)
+enum class ERPGAbilityInput : uint8
+{
+    None,
+    Confirm,
+    Cancel,
+    Ability1,
+    Ability2,
+};
 
 USTRUCT()
 struct FRPGCharacterInputActions
@@ -17,10 +29,13 @@ struct FRPGCharacterInputActions
     class UInputAction* JumpAction;
     UPROPERTY(EditDefaultsOnly, Transient)
     class UInputAction* LookAction;
+
+    UPROPERTY(EditDefaultsOnly, Transient)
+    class UInputAction* BlockAction;
 };
 
-UCLASS()
-class ARPGCharacter : public ACharacter
+UCLASS(BlueprintType)
+class ARPGCharacter : public ACharacter, public IAbilitySystemInterface
 {
     GENERATED_BODY()
 public:
@@ -28,31 +43,51 @@ public:
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
     bool IsJumping() const;
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE bool IsBlocking() const { return Blocking; }
+
+    /** Begin IAbilitySystemInterface methods */
+    FORCEINLINE virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
+    /** End IAbilitySystemInterface methods */
+
 protected:
     UFUNCTION()
-    void OnMovementAction(const FInputActionValue& actionValue);
+    void OnStartJump();
     UFUNCTION()
-    void OnStartJumpAction(const FInputActionValue& actionValue);
+    void OnEndJump();
     UFUNCTION()
-    void OnEndJumpAction(const FInputActionValue& actionValue);
+    void OnMoveForward(float value);
     UFUNCTION()
-    void OnLookAction(const FInputActionValue& actionValue);
+    void OnMoveRight(float value);
+    UFUNCTION()
+    void LookUp(float value);
+    UFUNCTION()
+    void Turn(float value);
 
 public:
     UPROPERTY(EditDefaultsOnly)
     FRPGCharacterInputActions InputActions;
     UPROPERTY(EditDefaultsOnly, Transient)
     class UInputMappingContext* InputMapping;
+    UPROPERTY(EditDefaultsOnly, Transient)
+    TSubclassOf<class UGameplayAbility> Ability;
 private:
     UPROPERTY(VisibleAnywhere, Transient)
     class USkeletalMeshComponent* SkeletalMeshComponent;
     UPROPERTY(VisibleAnywhere, Transient)
     class USkeletalMeshComponent* SwordMeshComponent;
     UPROPERTY(VisibleAnywhere, Transient)
-    class USkeletalMeshComponent* ShieldMeshComponent;
+    class UStaticMeshComponent* ShieldStaticMeshComponent;
 
     UPROPERTY(VisibleAnywhere, Transient)
     class USpringArmComponent* SpringArmComponent;
     UPROPERTY(VisibleAnywhere, Transient)
     class UCameraComponent* CameraComponent;
+
+    UPROPERTY(VisibleAnywhere, Transient)
+    class UAbilitySystemComponent* AbilitySystemComponent;
+    UPROPERTY(VisibleAnywhere, Transient)
+    class URPGAttributeSet* RPGAttributeSet;
+
+    bool Blocking {false};
 };
