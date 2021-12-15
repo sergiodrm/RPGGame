@@ -20,8 +20,8 @@ void URPGGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
             montageEndDelegate.BindLambda([&](UAnimMontage*, bool)
             {
                 GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.f, FColor::Green, TEXT("Finish montage"));
-                //EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
                 FinishAbilityMontage();
+                EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
             });
             animInstance->Montage_SetEndDelegate(montageEndDelegate, AbilityAnimationMontage);
         }

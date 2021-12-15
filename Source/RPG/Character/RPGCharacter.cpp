@@ -129,26 +129,38 @@ bool ARPGCharacter::IsJumping() const
 
 void ARPGCharacter::OnStartJump()
 {
-    Jump();
+    if (!MovementBlocked)
+    {
+        Jump();
+    }
 }
 
 void ARPGCharacter::OnEndJump()
 {
-    StopJumping();
+    if (!MovementBlocked)
+    {
+        StopJumping();
+    }
 }
 
 void ARPGCharacter::OnMoveForward(float value)
 {
-    const FVector direction {value, 0.f, 0.f};
-    const FRotator forward = GetControlRotation();
-    AddMovementInput(forward.RotateVector(direction));
+    if (!MovementBlocked)
+    {
+        const FVector direction {value, 0.f, 0.f};
+        const FRotator forward = GetControlRotation();
+        AddMovementInput(forward.RotateVector(direction));
+    }
 }
 
 void ARPGCharacter::OnMoveRight(float value)
 {
-    const FVector direction {0.f, value, 0.f};
-    const FRotator forward = GetControlRotation();
-    AddMovementInput(forward.RotateVector(direction));
+    if (!MovementBlocked)
+    {
+        const FVector direction {0.f, value, 0.f};
+        const FRotator forward = GetControlRotation();
+        AddMovementInput(forward.RotateVector(direction));
+    }
 }
 
 void ARPGCharacter::LookUp(float value)

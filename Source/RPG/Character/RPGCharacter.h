@@ -39,6 +39,9 @@ public:
     UFUNCTION(BlueprintCallable)
     FORCEINLINE bool IsBlocking() const { return Blocking; }
 
+    UFUNCTION(BlueprintCallable)
+    void BlockMovement(bool blocked) { MovementBlocked = blocked; }
+
     /** Begin IAbilitySystemInterface methods */
     FORCEINLINE virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
     /** End IAbilitySystemInterface methods */
@@ -86,4 +89,5 @@ private:
     class URPGAttributeSet* RPGAttributeSet;
 
     bool Blocking {false};
+    bool MovementBlocked {false};
 };
