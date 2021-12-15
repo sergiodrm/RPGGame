@@ -4,3 +4,12 @@
 
 #include "CoreMinimal.h"
 
+UENUM(BlueprintType)
+enum class ERPGAbilityInput : uint8
+{
+    None,
+    Confirm,
+    Cancel,
+    Ability1,
+    Ability2,
+};

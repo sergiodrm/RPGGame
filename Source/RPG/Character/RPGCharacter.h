@@ -71,8 +71,6 @@ public:
     TSubclassOf<class UGameplayEffect> DefaultAbilityEffect;
 private:
     UPROPERTY(VisibleAnywhere, Transient)
-    class USkeletalMeshComponent* SkeletalMeshComponent;
-    UPROPERTY(VisibleAnywhere, Transient)
     class USkeletalMeshComponent* SwordMeshComponent;
     UPROPERTY(VisibleAnywhere, Transient)
     class UStaticMeshComponent* ShieldStaticMeshComponent;

@@ -15,4 +15,5 @@ class RPG_API ARPGGameModeBase : public AGameModeBase
     GENERATED_BODY()
 public:
     ARPGGameModeBase();
+    virtual void BeginPlay() override;
 };
