@@ -64,14 +64,10 @@ protected:
     virtual void InitializeAbilities();
 
 public:
-    UPROPERTY(EditDefaultsOnly)
-    FRPGCharacterInputActions InputActions;
-    UPROPERTY(EditDefaultsOnly, Transient)
-    class UInputMappingContext* InputMapping;
-    UPROPERTY(EditDefaultsOnly, Transient)
-    TSubclassOf<class URPGGameplayAbility> Ability;
-    UPROPERTY(EditDefaultsOnly, Transient)
-    TSubclassOf<class UGameplayEffect> DefaultAbilityEffect;
+    UPROPERTY(EditDefaultsOnly, Transient, Category = "Gameplay Abilities")
+    TArray<TSubclassOf<class URPGGameplayAbility>> Abilities;
+    UPROPERTY(EditDefaultsOnly, Transient, Category = "Gameplay Abilities")
+    TArray<TSubclassOf<class UGameplayEffect>> StartupGameplayEffects;
 private:
     UPROPERTY(VisibleAnywhere, Transient)
     class USkeletalMeshComponent* SwordMeshComponent;

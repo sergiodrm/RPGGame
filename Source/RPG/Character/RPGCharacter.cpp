@@ -51,19 +51,6 @@ ARPGCharacter::ARPGCharacter()
 void ARPGCharacter::BeginPlay()
 {
     Super::BeginPlay();
-    // Set input context
-    if (APlayerController* controller = GetController<APlayerController>())
-    {
-        // Get the Enhanced Input Local Player Subsystem from the Local Player related to our Player Controller.
-        if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(controller->GetLocalPlayer()))
-        {
-            // PawnClientRestart can run more than once in an Actor's lifetime, so start by clearing out any leftover mappings.
-            subsystem->ClearAllMappings();
-
-            // Add each mapping context, along with their priority values. Higher values outprioritize lower values.
-            subsystem->AddMappingContext(InputMapping, 0);
-        }
-    }
 
     if (AbilitySystemComponent)
     {
@@ -175,24 +162,30 @@ void ARPGCharacter::Turn(float value)
 
 void ARPGCharacter::InitializeAttributes()
 {
-    if (AbilitySystemComponent && DefaultAbilityEffect)
+    if (AbilitySystemComponent)
     {
         FGameplayEffectContextHandle effectContext = AbilitySystemComponent->MakeEffectContext();
         effectContext.AddSourceObject(this);
 
-        FGameplayEffectSpecHandle specHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAbilityEffect, 1.f, effectContext);
-        if (specHandle.IsValid())
+        for (const TSubclassOf<UGameplayEffect>& effectClass : StartupGameplayEffects)
         {
-            FActiveGameplayEffectHandle gameplayEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
+            FGameplayEffectSpecHandle specHandle = AbilitySystemComponent->MakeOutgoingSpec(effectClass, 1.f, effectContext);
+            if (specHandle.IsValid())
+            {
+                AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
+            }
         }
     }
 }
 
 void ARPGCharacter::InitializeAbilities()
 {
-    if (AbilitySystemComponent && Ability && !AbilitySystemComponent->FindAbilitySpecFromClass(Ability))
+    if (AbilitySystemComponent)
     {
-        const FGameplayAbilitySpec abilitySpec(Ability, 1, static_cast<int32>(Ability.GetDefaultObject()->AbilityInput), this);
-        AbilitySystemComponent->GiveAbility(abilitySpec);
+        for (const TSubclassOf<URPGGameplayAbility>& abilityClass : Abilities)
+        {
+            const FGameplayAbilitySpec abilitySpec(abilityClass, 1, static_cast<int32>(abilityClass.GetDefaultObject()->AbilityInput), this);
+            AbilitySystemComponent->GiveAbility(abilitySpec);
+        }
     }
 }
