@@ -3,8 +3,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -54,12 +52,13 @@ void ARPGCharacter::BeginPlay()
 
     if (AbilitySystemComponent)
     {
-        AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(RPGAttributeSet->GetHealthAttribute()).AddLambda([](const FOnAttributeChangeData& data)
+        AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(RPGAttributeSet->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& data)
         {
-            if (GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Red, FString::Printf(TEXT("Health changed: %f"), data.NewValue));
-            }
+            OnHealthAttributeChangedDelegate.Broadcast(data.OldValue, data.NewValue, RPGAttributeSet->GetMaxHealth());
+        });
+        AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(RPGAttributeSet->GetStaminaAttribute()).AddLambda([this](const FOnAttributeChangeData& data)
+        {
+            OnStaminaAttributeChangedDelegate.Broadcast(data.OldValue, data.NewValue, RPGAttributeSet->GetMaxStamina());
         });
 
         AbilitySystemComponent->InitAbilityActorInfo(this, this);

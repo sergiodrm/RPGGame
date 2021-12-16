@@ -8,7 +8,7 @@ public class RPG : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayAbilities", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayAbilities", "UMG", "Slate", "SlateCore", "HeadMountedDisplay" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

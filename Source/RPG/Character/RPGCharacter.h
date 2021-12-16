@@ -1,29 +1,14 @@
 #pragma once
 #include "CoreMinimal.h"
 
-#include "InputActionValue.h"
-#include "InputMappingContext.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "RPGCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FHealthAttributeChangedDelegate, float, float, float);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FStaminaAttributeChangedDelegate, float, float, float);
 
-USTRUCT()
-struct FRPGCharacterInputActions
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditDefaultsOnly, Transient)
-    class UInputAction* MovementAction;
-    UPROPERTY(EditDefaultsOnly, Transient)
-    class UInputAction* JumpAction;
-    UPROPERTY(EditDefaultsOnly, Transient)
-    class UInputAction* LookAction;
-
-    UPROPERTY(EditDefaultsOnly, Transient)
-    class UInputAction* BlockAction;
-};
 
 UCLASS(BlueprintType)
 class ARPGCharacter : public ACharacter, public IAbilitySystemInterface
@@ -68,6 +53,11 @@ public:
     TArray<TSubclassOf<class URPGGameplayAbility>> Abilities;
     UPROPERTY(EditDefaultsOnly, Transient, Category = "Gameplay Abilities")
     TArray<TSubclassOf<class UGameplayEffect>> StartupGameplayEffects;
+
+    // Delegates
+    FHealthAttributeChangedDelegate OnHealthAttributeChangedDelegate;
+    FStaminaAttributeChangedDelegate OnStaminaAttributeChangedDelegate;
+
 private:
     UPROPERTY(VisibleAnywhere, Transient)
     class USkeletalMeshComponent* SwordMeshComponent;
