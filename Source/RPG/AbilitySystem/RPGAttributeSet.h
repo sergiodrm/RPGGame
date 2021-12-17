@@ -19,17 +19,32 @@ class URPGAttributeSet : public UAttributeSet
 public:
     virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 public:
+    UPROPERTY(BlueprintReadOnly, Category = "Vitality")
+    FGameplayAttributeData Vitality {5.f};
+    ATTRIBUTE_ACCESSORS(URPGAttributeSet, Vitality)
+    UPROPERTY(BlueprintReadOnly, Category = "Endurance")
+    FGameplayAttributeData Endurance {5.f};
+    ATTRIBUTE_ACCESSORS(URPGAttributeSet, Endurance)
+    UPROPERTY(BlueprintReadOnly, Category = "Strength")
+    FGameplayAttributeData Strength {5.f};
+    ATTRIBUTE_ACCESSORS(URPGAttributeSet, Strength)
+
     UPROPERTY(BlueprintReadOnly, Category = "Health")
     FGameplayAttributeData Health;
     ATTRIBUTE_ACCESSORS(URPGAttributeSet, Health)
     UPROPERTY(BlueprintReadOnly, Category = "Health")
     FGameplayAttributeData MaxHealth;
     ATTRIBUTE_ACCESSORS(URPGAttributeSet, MaxHealth)
-
     UPROPERTY(BlueprintReadOnly, Category = "Stamina")
     FGameplayAttributeData Stamina;
     ATTRIBUTE_ACCESSORS(URPGAttributeSet, Stamina)
     UPROPERTY(BlueprintReadOnly, Category = "Stamina")
     FGameplayAttributeData MaxStamina;
     ATTRIBUTE_ACCESSORS(URPGAttributeSet, MaxStamina)
+    UPROPERTY(BlueprintReadOnly, Category = "AttackPower")
+    FGameplayAttributeData AttackPower;
+    ATTRIBUTE_ACCESSORS(URPGAttributeSet, AttackPower)
+    UPROPERTY(BlueprintReadOnly, Category = "Defense")
+    FGameplayAttributeData Defense;
+    ATTRIBUTE_ACCESSORS(URPGAttributeSet, Defense)
 };
