@@ -11,8 +11,13 @@ class URPGGameplayAbility : public UGameplayAbility
 {
     GENERATED_BODY()
 public:
+    virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+    virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
     FORCEINLINE virtual uint8 GetGameplayTaskDefaultPriority() const override { return FGameplayTasks::DefaultPriority; }
 public:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+    bool BlockMovementWhileExecution {false};
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability|Input")
     ERPGAbilityInput AbilityInput {ERPGAbilityInput::None};
 };
