@@ -60,11 +60,6 @@ public:
 
 private:
     UPROPERTY(VisibleAnywhere, Transient)
-    class USkeletalMeshComponent* SwordMeshComponent;
-    UPROPERTY(VisibleAnywhere, Transient)
-    class UStaticMeshComponent* ShieldStaticMeshComponent;
-
-    UPROPERTY(VisibleAnywhere, Transient)
     class USpringArmComponent* SpringArmComponent;
     UPROPERTY(VisibleAnywhere, Transient)
     class UCameraComponent* CameraComponent;

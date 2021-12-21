@@ -23,12 +23,6 @@ ARPGCharacter::ARPGCharacter()
         mesh->SetRelativeLocation({0.f, 0.f, -capsuleComponent->GetScaledCapsuleHalfHeight()});
         mesh->SetRelativeRotation({0.f, -90.f, 0.f});
 
-        SwordMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMeshComponent"));
-        SwordMeshComponent->SetupAttachment(mesh, TEXT("RightHandSocket"));
-
-        ShieldStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMeshComponent"));
-        ShieldStaticMeshComponent->SetupAttachment(mesh, TEXT("ShieldSocket"));
-
         SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
         SpringArmComponent->SetupAttachment(mesh);
         SpringArmComponent->TargetArmLength = 200.f;
@@ -87,8 +81,8 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
                                                     TEXT("ConfirmTarget"),
                                                     TEXT("CancelTarget"),
                                                     TEXT("ERPGAbilityInput"),
-                                                    static_cast<int32>(ERPGAbilityInput::Confirm),
-                                                    static_cast<int32>(ERPGAbilityInput::Cancel)
+                                                    static_cast<int32>(ERPGAbilityInput::ConfirmAbility),
+                                                    static_cast<int32>(ERPGAbilityInput::CancelAbility)
                                                    );
         AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent, inputBinds);
     }
