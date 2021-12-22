@@ -36,6 +36,10 @@ void URPGAbilityTask_PlayMontageAndWaitInput::Activate()
                 }
             }
         }
+
+        // Bind input
+        InputPressHandle = AbilitySystemComponent->AbilityReplicatedEventDelegate(EAbilityGenericReplicatedEvent::InputPressed, GetAbilitySpecHandle(), GetActivationPredictionKey()).AddUObject(this, &URPGAbilityTask_PlayMontageAndWaitInput::OnInputPressed);
+        InputReleaseHandle = AbilitySystemComponent->AbilityReplicatedEventDelegate(EAbilityGenericReplicatedEvent::InputReleased, GetAbilitySpecHandle(), GetActivationPredictionKey()).AddUObject(this, &URPGAbilityTask_PlayMontageAndWaitInput::OnInputReleased);
     }
 
     if (!montagePlayed)
@@ -125,4 +129,28 @@ bool URPGAbilityTask_PlayMontageAndWaitInput::StopPlayingMontage()
         }
     }
     return success;
+}
+
+void URPGAbilityTask_PlayMontageAndWaitInput::OnInputPressed()
+{
+    if (Ability && AbilitySystemComponent)
+    {
+        AbilitySystemComponent->AbilityReplicatedEventDelegate(EAbilityGenericReplicatedEvent::InputPressed, GetAbilitySpecHandle(), GetActivationPredictionKey()).Remove(InputPressHandle);
+    }
+    if (ShouldBroadcastAbilityTaskDelegates())
+    {
+        OnInputPress.Broadcast();
+    }
+}
+
+void URPGAbilityTask_PlayMontageAndWaitInput::OnInputReleased()
+{
+    if (Ability && AbilitySystemComponent)
+    {
+        AbilitySystemComponent->AbilityReplicatedEventDelegate(EAbilityGenericReplicatedEvent::InputReleased, GetAbilitySpecHandle(), GetActivationPredictionKey()).Remove(InputReleaseHandle);
+    }
+    if (ShouldBroadcastAbilityTaskDelegates())
+    {
+        OnInputRelease.Broadcast();
+    }
 }

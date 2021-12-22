@@ -44,6 +44,11 @@ protected:
 
     bool StopPlayingMontage();
 
+    UFUNCTION()
+        void OnInputPressed();
+    UFUNCTION()
+        void OnInputReleased();
+
 public:
     UPROPERTY(BlueprintAssignable)
     FPlayMontageDelegate OnMontageCompleted;
@@ -65,4 +70,7 @@ private:
     FOnMontageBlendingOutStarted MontageBlendingOutDelegate;
     FOnMontageEnded MontageEndedDelegate;
     FDelegateHandle CanceledHandle;
+
+    FDelegateHandle InputPressHandle;
+    FDelegateHandle InputReleaseHandle;
 };
