@@ -3,4 +3,6 @@
 #include "RPG.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, RPG, "RPG" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, RPG, "RPG");
+
+DEFINE_LOG_CATEGORY(LogRPG);

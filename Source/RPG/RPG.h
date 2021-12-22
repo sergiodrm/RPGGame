@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 
+#define RPG_LOG(Level, Format, ...) UE_LOG(LogRPG, Level, Format, __VA_ARGS__)
+
+DECLARE_LOG_CATEGORY_EXTERN(LogRPG, Log, All);
+
 UENUM(BlueprintType)
 enum class ERPGAbilityInput : uint8
 {
