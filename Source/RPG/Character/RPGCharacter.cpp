@@ -25,17 +25,8 @@ ARPGCharacter::ARPGCharacter()
         mesh->SetRelativeLocation({0.f, 0.f, -capsuleComponent->GetScaledCapsuleHalfHeight()});
         mesh->SetRelativeRotation({0.f, -90.f, 0.f});
 
-        SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-        SpringArmComponent->SetupAttachment(mesh);
-        SpringArmComponent->TargetArmLength = 200.f;
-        SpringArmComponent->bEnableCameraLag = true;
-        SpringArmComponent->bUsePawnControlRotation = true;
-
-        CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-        CameraComponent->SetupAttachment(SpringArmComponent);
-
         MeleeAttackBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeAttackBoxComponent"));
-        MeleeAttackBoxComponent->SetupAttachment(mesh, TEXT("SwordBoxColliderSocket"));
+        MeleeAttackBoxComponent->SetupAttachment(mesh, TEXT("MeleeBoxColliderSocket"));
         MeleeAttackBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ARPGCharacter::OnMeleeAttackBoxComponentBeginOverlap);
         MeleeAttackBoxComponent->SetGenerateOverlapEvents(false);
     }
@@ -69,35 +60,25 @@ void ARPGCharacter::BeginPlay()
     }
 }
 
-void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-    PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ARPGCharacter::OnStartJump);
-    PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ARPGCharacter::OnEndJump);
-
-    PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ARPGCharacter::OnMoveForward);
-    PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ARPGCharacter::OnMoveRight);
-    PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ARPGCharacter::Turn);
-    PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ARPGCharacter::LookUp);
-
-
-    if (AbilitySystemComponent)
-    {
-        const FGameplayAbilityInputBinds inputBinds(
-                                                    TEXT("ConfirmTarget"),
-                                                    TEXT("CancelTarget"),
-                                                    TEXT("ERPGAbilityInput"),
-                                                    static_cast<int32>(ERPGAbilityInput::ConfirmAbility),
-                                                    static_cast<int32>(ERPGAbilityInput::CancelAbility)
-                                                   );
-        AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent, inputBinds);
-    }
-}
 
 bool ARPGCharacter::IsJumping() const
 {
-    return GetCharacterMovement()->MovementMode == MOVE_Falling;
+    return GetCharacterMovement()->IsFalling();
+}
+
+void ARPGCharacter::BlockMovement(bool blocked)
+{
+    if (UCharacterMovementComponent* characterMovementComponent = GetCharacterMovement())
+    {
+        if (blocked)
+        {
+            characterMovementComponent->DisableMovement();
+        }
+        else
+        {
+            characterMovementComponent->SetDefaultMovementMode();
+        }
+    }
 }
 
 void ARPGCharacter::BeginHandleMeleeAttack()
@@ -110,52 +91,6 @@ void ARPGCharacter::EndHandleMeleeAttack()
 {
     RPG_LOG(Log, TEXT("EndHandleMeleeAttack"));
     MeleeAttackBoxComponent->SetGenerateOverlapEvents(false);
-}
-
-void ARPGCharacter::OnStartJump()
-{
-    if (!MovementBlocked)
-    {
-        Jump();
-    }
-}
-
-void ARPGCharacter::OnEndJump()
-{
-    if (!MovementBlocked)
-    {
-        StopJumping();
-    }
-}
-
-void ARPGCharacter::OnMoveForward(float value)
-{
-    if (!MovementBlocked)
-    {
-        const FVector direction {value, 0.f, 0.f};
-        const FRotator forward = GetControlRotation();
-        AddMovementInput(forward.RotateVector(direction));
-    }
-}
-
-void ARPGCharacter::OnMoveRight(float value)
-{
-    if (!MovementBlocked)
-    {
-        const FVector direction {0.f, value, 0.f};
-        const FRotator forward = GetControlRotation();
-        AddMovementInput(forward.RotateVector(direction));
-    }
-}
-
-void ARPGCharacter::LookUp(float value)
-{
-    AddControllerPitchInput(value);
-}
-
-void ARPGCharacter::Turn(float value)
-{
-    AddControllerYawInput(value);
 }
 
 void ARPGCharacter::OnMeleeAttackBoxComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
