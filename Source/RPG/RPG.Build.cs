@@ -11,7 +11,8 @@ public class RPG : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", 
 			"GameplayAbilities", 
 			"UMG", "Slate", "SlateCore", "HeadMountedDisplay",
-			"GameplayTasks"});
+			"GameplayTasks",
+			"GameplayTags"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

@@ -98,6 +98,13 @@ void ARPGCharacter::OnMeleeAttackBoxComponentBeginOverlap(UPrimitiveComponent* O
     if (OtherActor && OtherActor != this)
     {
         OnHitMeleeAttackDelegate.Broadcast(OtherActor);
+
+        // Send gameplay event through ASC
+        FGameplayEventData gameplayEventData;
+        gameplayEventData.Instigator = this;
+        gameplayEventData.Target = OtherActor;
+        gameplayEventData.EventTag = AttackHitSuccessTag;
+        AbilitySystemComponent->HandleGameplayEvent(AttackHitSuccessTag, &gameplayEventData);
     }
 }
 

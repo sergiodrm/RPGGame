@@ -51,6 +51,8 @@ public:
     TArray<TSubclassOf<class URPGGameplayAbility>> Abilities;
     UPROPERTY(EditDefaultsOnly, Transient, Category = "Gameplay Abilities")
     TArray<TSubclassOf<class UGameplayEffect>> StartupGameplayEffects;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Transient, Category = "Gameplay Abilities")
+    FGameplayTag AttackHitSuccessTag;
 
     // Delegates
     FAttributeChangedDelegate OnHealthAttributeChangedDelegate;
