@@ -4,6 +4,7 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "RPG/RPG.h"
@@ -32,6 +33,11 @@ ARPGCharacter::ARPGCharacter()
 
         CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
         CameraComponent->SetupAttachment(SpringArmComponent);
+
+        MeleeAttackBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeAttackBoxComponent"));
+        MeleeAttackBoxComponent->SetupAttachment(mesh, TEXT("SwordBoxColliderSocket"));
+        MeleeAttackBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ARPGCharacter::OnMeleeAttackBoxComponentBeginOverlap);
+        MeleeAttackBoxComponent->SetGenerateOverlapEvents(false);
     }
 
     AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
@@ -97,11 +103,13 @@ bool ARPGCharacter::IsJumping() const
 void ARPGCharacter::BeginHandleMeleeAttack()
 {
     RPG_LOG(Log, TEXT("BeginHandleMeleeAttack"));
+    MeleeAttackBoxComponent->SetGenerateOverlapEvents(true);
 }
 
 void ARPGCharacter::EndHandleMeleeAttack()
 {
     RPG_LOG(Log, TEXT("EndHandleMeleeAttack"));
+    MeleeAttackBoxComponent->SetGenerateOverlapEvents(false);
 }
 
 void ARPGCharacter::OnStartJump()
@@ -148,6 +156,14 @@ void ARPGCharacter::LookUp(float value)
 void ARPGCharacter::Turn(float value)
 {
     AddControllerYawInput(value);
+}
+
+void ARPGCharacter::OnMeleeAttackBoxComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor)
+    {
+        OnHitMeleeAttackDelegate.Broadcast(OtherActor);
+    }
 }
 
 void ARPGCharacter::InitializeAttributes()

@@ -49,6 +49,14 @@ protected:
     UFUNCTION()
     void Turn(float value);
 
+    UFUNCTION()
+    void OnMeleeAttackBoxComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+                                               AActor* OtherActor,
+                                               UPrimitiveComponent* OtherComp,
+                                               int32 OtherBodyIndex,
+                                               bool bFromSweep,
+                                               const FHitResult& SweepResult);
+
     virtual void InitializeAttributes();
     virtual void InitializeAbilities();
 
@@ -69,9 +77,12 @@ private:
     class USpringArmComponent* SpringArmComponent;
     UPROPERTY(VisibleAnywhere, Transient)
     class UCameraComponent* CameraComponent;
+    UPROPERTY(VisibleAnywhere, Transient)
+    class UBoxComponent* MeleeAttackBoxComponent;
 
     UPROPERTY(VisibleAnywhere, Transient)
     class UAbilitySystemComponent* AbilitySystemComponent;
+
     UPROPERTY(VisibleAnywhere, Transient)
     class URPGAttributeSet* RPGAttributeSet;
 
