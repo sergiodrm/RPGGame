@@ -10,6 +10,7 @@
 #include "RPG/RPG.h"
 #include "RPG/AbilitySystem/Abilities/RPGGameplayAbility.h"
 #include "RPG/AbilitySystem/RPGAttributeSet.h"
+#include "RPG/UI/Components/RPGCharacterWidgetComponent.h"
 
 ARPGCharacter::ARPGCharacter()
 {
@@ -36,6 +37,10 @@ ARPGCharacter::ARPGCharacter()
     AbilitySystemComponent->SetIsReplicated(false);
 
     RPGAttributeSet = CreateDefaultSubobject<URPGAttributeSet>(TEXT("RGPAttributeSet"));
+
+    WidgetComponent = CreateDefaultSubobject<URPGCharacterWidgetComponent>(TEXT("CharacterWidgetComponent"));
+    WidgetComponent->SetupAttachment(RootComponent);
+    WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void ARPGCharacter::BeginPlay()
@@ -98,13 +103,6 @@ void ARPGCharacter::OnMeleeAttackBoxComponentBeginOverlap(UPrimitiveComponent* O
     if (OtherActor && OtherActor != this)
     {
         OnHitMeleeAttackDelegate.Broadcast(OtherActor);
-
-        // Send gameplay event through ASC
-        FGameplayEventData gameplayEventData;
-        gameplayEventData.Instigator = this;
-        gameplayEventData.Target = OtherActor;
-        gameplayEventData.EventTag = AttackHitSuccessTag;
-        AbilitySystemComponent->HandleGameplayEvent(AttackHitSuccessTag, &gameplayEventData);
     }
 }
 

@@ -62,6 +62,9 @@ public:
 
 protected:
     UPROPERTY(VisibleAnywhere, Transient)
+    class URPGCharacterWidgetComponent* WidgetComponent;
+
+    UPROPERTY(VisibleAnywhere, Transient)
     class UBoxComponent* MeleeAttackBoxComponent;
 
     UPROPERTY(VisibleAnywhere, Transient)
