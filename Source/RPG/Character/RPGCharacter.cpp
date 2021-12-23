@@ -6,7 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "RPG/AbilitySystem/RPGGameplayAbility.h"
+#include "RPG/RPG.h"
+#include "RPG/AbilitySystem/Abilities/RPGGameplayAbility.h"
 #include "RPG/AbilitySystem/RPGAttributeSet.h"
 
 ARPGCharacter::ARPGCharacter()
@@ -88,24 +89,20 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     }
 }
 
-void ARPGCharacter::PossessedBy(AController* NewController)
-{
-    Super::PossessedBy(NewController);
-
-    //if (AbilitySystemComponent)
-    //{
-    //    AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-    //    InitializeAttributes();
-    //    InitializeAbilities();
-    //}
-}
-
 bool ARPGCharacter::IsJumping() const
 {
     return GetCharacterMovement()->MovementMode == MOVE_Falling;
 }
 
+void ARPGCharacter::BeginHandleMeleeAttack()
+{
+    RPG_LOG(Log, TEXT("BeginHandleMeleeAttack"));
+}
+
+void ARPGCharacter::EndHandleMeleeAttack()
+{
+    RPG_LOG(Log, TEXT("EndHandleMeleeAttack"));
+}
 
 void ARPGCharacter::OnStartJump()
 {

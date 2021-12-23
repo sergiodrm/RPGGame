@@ -6,8 +6,8 @@
 #include "AbilitySystemInterface.h"
 #include "RPGCharacter.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FHealthAttributeChangedDelegate, float, float, float);
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FStaminaAttributeChangedDelegate, float, float, float);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAttributeChangedDelegate, float, float, float);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitMeleeAttackDelegate, AActor*, hitActor);
 
 
 UCLASS(BlueprintType)
@@ -18,7 +18,6 @@ public:
     ARPGCharacter();
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-    virtual void PossessedBy(AController* NewController) override;
 
     bool IsJumping() const;
     UFUNCTION(BlueprintCallable)
@@ -26,6 +25,11 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void BlockMovement(bool blocked) { MovementBlocked = blocked; }
+
+    UFUNCTION(BlueprintCallable)
+    void BeginHandleMeleeAttack();
+    UFUNCTION(BlueprintCallable)
+    void EndHandleMeleeAttack();
 
     /** Begin IAbilitySystemInterface methods */
     FORCEINLINE virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
@@ -55,8 +59,10 @@ public:
     TArray<TSubclassOf<class UGameplayEffect>> StartupGameplayEffects;
 
     // Delegates
-    FHealthAttributeChangedDelegate OnHealthAttributeChangedDelegate;
-    FStaminaAttributeChangedDelegate OnStaminaAttributeChangedDelegate;
+    FAttributeChangedDelegate OnHealthAttributeChangedDelegate;
+    FAttributeChangedDelegate OnStaminaAttributeChangedDelegate;
+    UPROPERTY(BlueprintAssignable)
+    FHitMeleeAttackDelegate OnHitMeleeAttackDelegate;
 
 private:
     UPROPERTY(VisibleAnywhere, Transient)
