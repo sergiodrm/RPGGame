@@ -4,19 +4,27 @@
 
 static float Clamp(float value, float min, float max)
 {
-    return value <= min ? min : value <= max ? value : max;
+    return value <= min ? min : value >= max ? max : value;
 }
 
 void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
     Super::PostGameplayEffectExecute(Data);
+}
 
-    if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+    Super::PreAttributeChange(Attribute, NewValue);
+    if (Attribute == GetHealthAttribute())
     {
-        SetHealth(Clamp(GetHealth(), 0.f, GetMaxHealth()));
+        NewValue = Clamp(NewValue, 0.f, GetMaxHealth());
     }
-    else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+    else if (Attribute == GetStaminaAttribute())
     {
-        SetStamina(Clamp(GetStamina(), 0.f, GetMaxStamina()));
+        NewValue = Clamp(NewValue, 0.f, GetMaxStamina());
+    }
+    else if (Attribute == GetMagicAttribute())
+    {
+        NewValue = Clamp(NewValue, 0.f, GetMaxMagic());
     }
 }
