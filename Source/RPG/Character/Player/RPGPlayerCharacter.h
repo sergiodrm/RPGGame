@@ -16,10 +16,6 @@ public:
 
 protected:
     UFUNCTION()
-    void OnStartJump();
-    UFUNCTION()
-    void OnEndJump();
-    UFUNCTION()
     void OnMoveForward(float value);
     UFUNCTION()
     void OnMoveRight(float value);

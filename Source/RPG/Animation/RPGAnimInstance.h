@@ -13,8 +13,6 @@ public:
 
     UFUNCTION(BlueprintCallable)
     FVector GetMovementDirection() const;
-    UFUNCTION(BlueprintCallable)
-    bool IsJumping() const;
 
     UFUNCTION(BlueprintCallable)
     float GetForwardSpeed() const;

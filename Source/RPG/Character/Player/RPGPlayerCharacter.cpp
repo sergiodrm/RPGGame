@@ -22,8 +22,6 @@ ARPGPlayerCharacter::ARPGPlayerCharacter()
 void ARPGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
-    PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ARPGPlayerCharacter::OnStartJump);
-    PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ARPGPlayerCharacter::OnEndJump);
 
     PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ARPGPlayerCharacter::OnMoveForward);
     PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ARPGPlayerCharacter::OnMoveRight);
@@ -42,16 +40,6 @@ void ARPGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
                                                    );
         AbilitySystemComponent->BindAbilityActivationToInputComponent(PlayerInputComponent, inputBinds);
     }
-}
-
-void ARPGPlayerCharacter::OnStartJump()
-{
-    Jump();
-}
-
-void ARPGPlayerCharacter::OnEndJump()
-{
-    StopJumping();
 }
 
 void ARPGPlayerCharacter::OnMoveForward(float value)

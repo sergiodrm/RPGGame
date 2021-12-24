@@ -65,12 +65,6 @@ void ARPGCharacter::BeginPlay()
     }
 }
 
-
-bool ARPGCharacter::IsJumping() const
-{
-    return GetCharacterMovement()->IsFalling();
-}
-
 void ARPGCharacter::BlockMovement(bool blocked)
 {
     if (UCharacterMovementComponent* characterMovementComponent = GetCharacterMovement())

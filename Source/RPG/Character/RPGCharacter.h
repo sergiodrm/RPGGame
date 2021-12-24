@@ -18,7 +18,6 @@ public:
     ARPGCharacter();
     virtual void BeginPlay() override;
 
-    bool IsJumping() const;
     UFUNCTION(BlueprintCallable)
     FORCEINLINE bool IsBlocking() const { return Blocking; }
 

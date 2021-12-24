@@ -16,11 +16,6 @@ FVector URPGAnimInstance::GetMovementDirection() const
     return OwnerCharacter->GetLastMovementInputVector();
 }
 
-bool URPGAnimInstance::IsJumping() const
-{
-    return OwnerCharacter ? OwnerCharacter->IsJumping() : false;
-}
-
 float URPGAnimInstance::GetForwardSpeed() const
 {
     return OwnerCharacter ? OwnerCharacter->GetVelocity().SizeSquared() : 0.f;
