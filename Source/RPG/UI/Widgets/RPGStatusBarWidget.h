@@ -19,16 +19,22 @@ public:
     void SetHealthPercentage(float healthPercentage);
     UFUNCTION(BlueprintCallable)
     void SetStaminaPercentage(float staminaPercentage);
+    UFUNCTION(BlueprintCallable)
+    void SetMagicPercentage(float magicPercentage);
 
 protected:
     UFUNCTION()
     void OnHealthChanged(float oldValue, float newValue, float maxValue);
     UFUNCTION()
     void OnStaminaChanged(float oldValue, float newValue, float maxValue);
+    UFUNCTION()
+    void OnMagicChanged(float oldValue, float newValue, float maxValue);
 
 private:
     UPROPERTY(meta = (BindWidget))
     class UProgressBar* HealthBar;
     UPROPERTY(meta = (BindWidget))
     class UProgressBar* StaminaBar;
+    UPROPERTY(meta = (BindWidget))
+    class UProgressBar* MagicBar;
 };

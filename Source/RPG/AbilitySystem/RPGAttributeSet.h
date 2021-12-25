@@ -28,6 +28,9 @@ public:
     UPROPERTY(BlueprintReadOnly, Category = "Strength")
     FGameplayAttributeData Strength {5.f};
     ATTRIBUTE_ACCESSORS(URPGAttributeSet, Strength)
+    UPROPERTY(BlueprintReadOnly, Category = "Intelligence")
+    FGameplayAttributeData Intelligence {5.f};
+    ATTRIBUTE_ACCESSORS(URPGAttributeSet, Intelligence)
 
     UPROPERTY(BlueprintReadOnly, Category = "Health")
     FGameplayAttributeData Health;

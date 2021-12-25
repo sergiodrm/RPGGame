@@ -56,6 +56,8 @@ public:
     // Delegates
     FAttributeChangedDelegate OnHealthAttributeChangedDelegate;
     FAttributeChangedDelegate OnStaminaAttributeChangedDelegate;
+    FAttributeChangedDelegate OnMagicAttributeChangedDelegate;
+
     UPROPERTY(BlueprintAssignable)
     FHitMeleeAttackDelegate OnHitMeleeAttackDelegate;
 

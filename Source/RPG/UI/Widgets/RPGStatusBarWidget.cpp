@@ -15,6 +15,7 @@ void URPGStatusBarWidget::NativeConstruct()
         {
             character->OnHealthAttributeChangedDelegate.AddUObject(this, &URPGStatusBarWidget::OnHealthChanged);
             character->OnStaminaAttributeChangedDelegate.AddUObject(this, &URPGStatusBarWidget::OnStaminaChanged);
+            character->OnMagicAttributeChangedDelegate.AddUObject(this, &URPGStatusBarWidget::OnMagicChanged);
         }
     }
 }
@@ -29,6 +30,11 @@ void URPGStatusBarWidget::OnStaminaChanged(float oldValue, float newValue, float
     SetStaminaPercentage(newValue / maxValue);
 }
 
+void URPGStatusBarWidget::OnMagicChanged(float oldValue, float newValue, float maxValue)
+{
+    SetMagicPercentage(newValue / maxValue);
+}
+
 void URPGStatusBarWidget::SetHealthPercentage(float healthPercentage)
 {
     HealthBar->SetPercent(healthPercentage);
@@ -37,4 +43,9 @@ void URPGStatusBarWidget::SetHealthPercentage(float healthPercentage)
 void URPGStatusBarWidget::SetStaminaPercentage(float staminaPercentage)
 {
     StaminaBar->SetPercent(staminaPercentage);
+}
+
+void URPGStatusBarWidget::SetMagicPercentage(float magicPercentage)
+{
+    MagicBar->SetPercent(magicPercentage);
 }

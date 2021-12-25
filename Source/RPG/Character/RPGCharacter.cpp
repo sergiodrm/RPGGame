@@ -57,6 +57,10 @@ void ARPGCharacter::BeginPlay()
         {
             OnStaminaAttributeChangedDelegate.Broadcast(data.OldValue, data.NewValue, RPGAttributeSet->GetMaxStamina());
         });
+        AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(RPGAttributeSet->GetMagicAttribute()).AddLambda([this](const FOnAttributeChangeData& data)
+        {
+            OnMagicAttributeChangedDelegate.Broadcast(data.OldValue, data.NewValue, RPGAttributeSet->GetMaxMagic());
+        });
 
         AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
