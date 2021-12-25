@@ -17,7 +17,6 @@ class URPGAttributeSet : public UAttributeSet
     GENERATED_BODY()
 
 public:
-    virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
     virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Vitality")
